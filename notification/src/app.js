@@ -12,10 +12,13 @@ connect().then(() => {
 
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.status(200).json({ message: 'Notification service is running' });
+});
 
 // heath check route
 app.get('/health', (req, res) => {
-    res.status(200).json({ message: 'Notification service is healthy' });
+    res.status(200).json({ status: 'ok', service: 'notification' });
 });
 
 

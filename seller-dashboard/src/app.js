@@ -70,6 +70,10 @@ app.get("/", (req, res) => {
 
 // ================= ERROR HANDLER =================
 
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", service: "seller-dashboard" });
+});
+
 app.use((err, req, res, next) => {
 
     console.error(err.stack);

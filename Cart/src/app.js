@@ -8,6 +8,14 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Cart service is running" })
+})
+
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", service: "cart" })
+})
+
 app.use("/api/cart", cartRoutes)
 
 

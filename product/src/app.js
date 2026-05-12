@@ -14,6 +14,15 @@ app.use(cors({
     origin: process.env.REACT_APP_URL, // React app URL
     credentials: true, // Allow cookies to be sent
 }))
+
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Product service is running" })
+})
+
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", service: "product" })
+})
+
 app.use("/api/products", productRoutes)
 
 app.use((err, req, res, next) => {

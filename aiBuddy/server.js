@@ -9,7 +9,8 @@ const httpServer = http.createServer(app)
 
 initSocketServer(httpServer);
 
+const port = process.env.PORT || 3005;
 
-httpServer.listen(3005, () => {
-    console.log("server is running on port 3005")
+httpServer.listen(port, () => {
+    console.log(`server is running on port ${port}`)
 });

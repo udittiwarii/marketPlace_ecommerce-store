@@ -37,13 +37,18 @@ async function registerUser(req, res) {
             role: role || 'user'
         })
 
-        // Publish user registration event to RabbitMQ
-        publishToQueue('AUTH_NOTIFICATIONS.user_registration', {
-            userId: newUser._id,
-            username: newUser.username,
-            email: newUser.email,
-            fullName: newUser.fullName
-        });
+
+        // Publish user registration events to RabbitMQ
+        await Promise.all([
+            publishToQueue('AUTH_NOTIFICATIONS.user_registration', {
+                userId: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                fullName: newUser.fullName
+            }),
+            publishToQueue('SELLER_DESHBOARD.new_user', newUser),
+            publishToQueue('SELLER_DESHBOARD.new_seller', newUser)
+        ]);
 
         // 🟢 1. Create Access Token (15 min)
         const accessToken = createAccessToken(newUser);

@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --runInBand",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "amqplib": "^1.0.7",

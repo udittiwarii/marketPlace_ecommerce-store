@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const productModel = require("../models/product.model")
 const { uploadImage } = require("../services/imagekit")
+const { publishToQueue } = require("./../broker/broker")
 
 function getProductStock(product) {
     let stock = (product.stock ?? 0) - (product.reserved ?? 0)
@@ -14,7 +15,6 @@ function serializeProduct(product) {
         description: product.description,
         brand: product.brand,
         amount: product.price.amount,
-        currency: product.price.currency,
         currency: product.price.currency,
         category: product.category,
         stock: getProductStock(product),
@@ -68,7 +68,18 @@ async function createProduct(req, res) {
             }))
         })
 
+        await Promise.all([
+            publishToQueue("PRODUCT-NOTIFICATION.product-created", {
+                title: product.title,
+                email: req.user.email,
+                brand: product.brand,
+            }),
+            publishToQueue("SELLER-DASHBOARD.PRODUCT_CREATED", product)
+        ])
+
         const saved = await product.save()
+
+
 
         return res.status(201).json({
             message: "Product created successfully",
@@ -190,6 +201,8 @@ async function updateProduct(req, res) {
             }
         }
 
+        publishToQueue("SELLER-DASHBOARD.PRODUCT_UPDATED", product)
+
         await product.save()
 
         return res.status(200).json({
@@ -224,6 +237,8 @@ async function deleteProduct(req, res) {
         }
 
         await productModel.findOneAndDelete({ _id: id, seller: req.user.id })
+
+        publishToQueue("SELLER-DASHBOARD.PRODUCT_DELETED", product)
 
         return res.status(200).json({ message: "Product deleted successfully" })
 
@@ -399,6 +414,8 @@ async function releaseInventory(req, res) {
 
         await productModel.bulkWrite(bulkOps);
 
+
+
         res.status(200).json({
             message: "Inventory released successfully"
         });
@@ -430,6 +447,7 @@ async function deductInventory(req, res) {
         }));
 
         const result = await productModel.bulkWrite(bulkOps);
+        publishToQueue("SELLER-DASHBOARD.INVENTORY_DEDUCTED", { items });
 
         res.status(200).json({
             message: "Inventory deducted",
@@ -455,6 +473,7 @@ async function restockInventory(req, res) {
         }));
 
         await productModel.bulkWrite(bulkOps);
+
 
         res.status(200).json({
             message: "Inventory restocked"

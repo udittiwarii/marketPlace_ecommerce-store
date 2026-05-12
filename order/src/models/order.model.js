@@ -19,6 +19,10 @@ const itemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     quantity: {
         type: Number,
         default: 1,
@@ -43,11 +47,18 @@ const itemSchema = new mongoose.Schema({
     }
 })
 
+const customerSnapshotSchema = new mongoose.Schema({
+    name: String,
+    username: String,
+    email: String
+}, { _id: false })
+
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+    customerSnapshot: customerSnapshotSchema,
     items: [itemSchema],
     status: {
         type: String,

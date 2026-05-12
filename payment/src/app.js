@@ -7,8 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cors({
-    origin: process.env.REACT_APP_URL, // React app URL
-    credentials: true, // Allow cookies to be sent
+  
 }));
 app.use(express.json());
 app.use(cookieParser());

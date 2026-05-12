@@ -2,6 +2,7 @@ const orderModel = require("./../models/order.model")
 const cartService = require('./../service/cart.service')
 const productService = require('./../service/product.service');
 const priceService = require("./../service/pricing.service")
+const { publishToQueue } = require("./../broker/broker");
 
 function readAccessToken(req) {
     if (req.cookies?.accessToken) {
@@ -16,6 +17,24 @@ function readAccessToken(req) {
     return null;
 }
 
+function getCustomerSnapshot(user) {
+    const name = [user?.fullName?.firstName, user?.fullName?.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+
+    return {
+        name: name || user?.username || "",
+        username: user?.username || "",
+        email: user?.email || ""
+    };
+}
+function publishOrderForDashboard(order) {
+    publishToQueue("SELLER-DASHBOARD.NEW_ORDER", order)
+        .catch((error) => {
+            console.error("Failed to publish seller dashboard order:", error.message);
+        });
+}
 async function updateOrderStatus(orderId, status) {
     const order = await orderModel.findById(orderId);
 
@@ -70,6 +89,7 @@ async function createOrderBYFromCart(req, res) {
 
             return {
                 product: product.id,
+                seller: product.seller,
                 quantity: cartItem.quantity,
                 price: {
                     amount: product.amount,
@@ -111,6 +131,7 @@ async function createOrderBYFromCart(req, res) {
             // 6. Create order
             order = await orderModel.create({
                 user: userId,
+                customerSnapshot: getCustomerSnapshot(req.user),
                 items: orderItems,
                 totalPrice
             });
@@ -131,6 +152,8 @@ async function createOrderBYFromCart(req, res) {
             status: order.status,
 
         });
+
+        publishOrderForDashboard(order);
 
         // 9. Clear cart async
         cartService.clearCart(accessToken)
@@ -187,6 +210,7 @@ async function createOrderBuyNow(req, res) {
 
         const orderItems = [{
             product: productId,
+            seller: product.seller,
             quantity: parsedQuantity,
             price: {
                 amount: product.amount,
@@ -213,6 +237,7 @@ async function createOrderBuyNow(req, res) {
         try {
             order = await orderModel.create({
                 user: userId,
+                customerSnapshot: getCustomerSnapshot(req.user),
                 items: orderItems,
                 totalPrice
             });
@@ -225,6 +250,8 @@ async function createOrderBuyNow(req, res) {
 
             throw err;
         }
+
+        publishOrderForDashboard(order);
 
         res.status(201).json({
             message: "Order created",

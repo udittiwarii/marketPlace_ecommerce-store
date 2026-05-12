@@ -9,11 +9,7 @@ jest.mock("../../src/service/product.service", () => ({
   releaseInventory: jest.fn(),
 }));
 
-jest.mock("../../src/models/order.model", () => ({
-  create: jest.fn(),
-  findById: jest.fn(),
-  countDocuments: jest.fn(),
-}));
+jest.mock("../../src/models/order.model", () => ({`r`n  create: jest.fn(),`r`n  findById: jest.fn(),`r`n  countDocuments: jest.fn(),`r`n}));`r`n`r`njest.mock("../../src/broker/broker", () => ({`r`n  publishToQueue: jest.fn().mockResolvedValue(),`r`n}));
 
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
@@ -35,8 +31,7 @@ describe("POST /api/order/from-cart", () => {
     return jwt.sign(
       {
         id: "507f1f77bcf86cd799439011",
-        role: "user",
-        ...payload,
+        role: "user",`r`n        username: "buyer_user",`r`n        email: "buyer@example.com",`r`n        ...payload,
       },
       process.env.JWT_SECRET,
     );
@@ -50,8 +45,7 @@ describe("POST /api/order/from-cart", () => {
       user: "507f1f77bcf86cd799439011",
       items: [
         {
-          product: productId,
-          quantity: 2,
+          product: productId,`r`n          seller: "507f191e810c19729de860eb",`r`n          quantity: 2,
           price: {
             amount: 500,
             currency: "INR",
@@ -78,8 +72,7 @@ describe("POST /api/order/from-cart", () => {
         title: "Keyboard",
         amount: 500,
         currency: "INR",
-        stock: 5,
-      },
+        stock: 5,`r`n        seller: "507f191e810c19729de860eb",`r`n      },
     ]);
     productService.reserveInventory.mockResolvedValue({ success: true });
     orderModel.create.mockResolvedValue(savedOrder);

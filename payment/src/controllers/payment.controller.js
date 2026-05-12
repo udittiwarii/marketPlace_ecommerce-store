@@ -71,7 +71,11 @@ async function createPayment(req, res) {
 
         })
 
+
+        publish('SELLER_DESHBOARD.new_payment', newPayment);
+
         await newPayment.save();
+
 
         return res.status(201).json({
             message: "Payment initiated successfully",
@@ -142,15 +146,19 @@ async function verifypayment(req, res) {
             await orderService.markOrderPaid(paymentRecord.orderId, serviceToken);
 
             // Publish payment completion event to RabbitMQ
-            await publish('PAYMENT_NOTIFICATION.PAYMENT_COMPLETION', {
-                paymentId: paymentRecord._id,
-                orderId: paymentRecord.orderId,
-                amount: paymentRecord.price.amount,
-                currency: paymentRecord.price.currency,
-                userId: paymentRecord.userId,
-                email: email,
-                username: username
-            });
+            await Promise.all([
+                publish('PAYMENT_NOTIFICATION.PAYMENT_COMPLETION', {
+                    paymentId: paymentRecord._id,
+                    orderId: paymentRecord.orderId,
+                    amount: paymentRecord.price.amount,
+                    currency: paymentRecord.price.currency,
+                    userId: paymentRecord.userId,
+                    email: email,
+                    username: username
+                }),
+                publish('SELLER_DESHBOARD.payment_completed', paymentRecord)
+            ]);
+
 
             return res.status(200).json({
                 message: "Payment verified and order marked as paid"

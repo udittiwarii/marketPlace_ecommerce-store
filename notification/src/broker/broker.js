@@ -6,6 +6,15 @@ async function connect() {
     if (connection) return connection;
     try {
         connection = await amqplib.connect(process.env.RABIT_URL);
+        connection.on("error", (err) => {
+            console.log("RabbitMQ error:", err.message);
+        });
+
+        connection.on("close", () => {
+            console.log("RabbitMQ disconnected. Reconnecting...");
+            setTimeout(connect, 5000);
+        });
+        console.log("RabbitMQ connected");
         channel = await connection.createChannel();
     } catch (error) {
         console.error('Error connecting to RabbitMQ:', error);

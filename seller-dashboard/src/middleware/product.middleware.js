@@ -41,6 +41,5 @@ function createAuthMiddleware(roles = ["seller"]) {
 
 
 module.exports = {
-    createAuthMiddleware,
-    serviceAuthMiddleware
+    createAuthMiddleware
 }

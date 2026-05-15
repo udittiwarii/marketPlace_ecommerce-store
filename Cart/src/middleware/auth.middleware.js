@@ -14,6 +14,7 @@ function readAccessToken(req) {
 function createAuthMiddleware(roles = ["user"]) {
     return function authMiddleware(req, res, next) {
         const token = readAccessToken(req)
+        console.log("Auth Middleware - Token:", token)
 
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' })

@@ -17,13 +17,7 @@ app.use(helmet());
 // Prevent Mongo injection
 
 // Enable CORS
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "http://localhost:3000"
-    ],
-    credentials: true
-}));
+app.use(cors());
 
 // cookieparser 
 

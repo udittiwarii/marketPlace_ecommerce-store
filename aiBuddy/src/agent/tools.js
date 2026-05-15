@@ -6,7 +6,7 @@ const searchProduct = tool(async ({ query, accessToken }) => {
     try {
 
 
-        const response = await axios.get(`http://localhost:3001/api/products/?q=${query}`, {
+        const response = await axios.get(`https://marketplace-ecommerce-store.onrender.com/api/products/?q=${query}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -30,7 +30,7 @@ const searchProduct = tool(async ({ query, accessToken }) => {
 
 const addCart = tool(async ({ productId, quantity, accessToken }) => {
     try {
-        const response = await axios.post("http://localhost:3001/api/cart/items", {
+        const response = await axios.post("https://marketplace-ecommerce-store-cartservice.onrender.com/api/cart/items", {
             productId,
             quantity
         }, {

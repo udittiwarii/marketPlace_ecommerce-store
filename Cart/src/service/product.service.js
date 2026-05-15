@@ -1,7 +1,7 @@
 const axios = require("axios");
 const redis = require("./../db/redis");
 
-const PRODUCT_SERVICE_URL = "http://localhost:3001/api/products";
+const PRODUCT_SERVICE_URL = process.env.product_service_url || "http://localhost:3001/api/products";
 const PRODUCT_CACHE_TTL = 300;
 
 function getProductCacheKey(productId) {

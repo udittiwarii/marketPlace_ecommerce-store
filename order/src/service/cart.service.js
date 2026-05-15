@@ -1,5 +1,5 @@
 const axios = require("axios");
-const cartURL = "http://localhost:3002/api/cart/"
+const cartURL = process.env.cart_service_url || "http://localhost:3002/api/cart/"
 
 function createServiceError(message, err) {
     const error = new Error(message);

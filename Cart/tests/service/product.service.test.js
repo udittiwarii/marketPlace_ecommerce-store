@@ -68,7 +68,7 @@ describe("product.service", () => {
     const products = await productService.getProductsBulk(["507f1f77bcf86cd799439032"]);
 
     expect(axios.get).toHaveBeenCalledWith(
-      "http://localhost:3001/api/products/bulk",
+      `${process.env.product_service_url}/api/products/bulk`,
       { ids: ["507f1f77bcf86cd799439032"] }
     );
 

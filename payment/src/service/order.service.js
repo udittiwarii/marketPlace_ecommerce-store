@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 
-const orderServiceUrl = "http://localhost:3003/api/order";
+const orderServiceUrl = process.env.order_service_url || "http://localhost:3003/api/order";
 
 const getOrderByID = async function (orderId, accessToken) {
     try {
